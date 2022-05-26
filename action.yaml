@@ -2,6 +2,9 @@
 
 name: Semantic versioning parser
 description: GitHub action for parsing semantic versions
+branding:
+  icon: bookmark
+  color: green
 outputs:
   patch:
     description: The patch version tag
