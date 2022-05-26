@@ -1,7 +1,7 @@
 ---
 
-name: Versions
-description: Versions
+name: Semantic versioning parser
+description: GitHub action for parsing semantic versions
 outputs:
   patch:
     description: The patch version tag

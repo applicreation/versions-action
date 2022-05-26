@@ -2,9 +2,9 @@
 
 repository:
   name: versions-action
-  description: GitHub action for retrieving versions
+  description: GitHub action for parsing semantic versions
   homepage: https://github.com/lickdltd/versions-action
-  topics: github-actions-versions, github-actions, versions
+  topics: github-actions-versions, github-actions, semantic-versions, versions
   private: false
   has_issues: true
   has_projects: false
