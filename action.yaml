@@ -1,0 +1,29 @@
+---
+
+name: Versions
+description: Versions
+outputs:
+  patch:
+    description: The patch version tag
+    value: ${{ steps.patch.outputs.version }}
+  minor:
+    description: The minor version tag
+    value: ${{ steps.minor.outputs.version }}
+  major:
+    description: The major version tag
+    value: ${{ steps.major.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - name: Get patch version
+      id: patch
+      shell: sh
+      run: echo ::set-output name=version::$(echo ${{ github.ref }} | cut -d / -f 3)
+    - name: Get minor version
+      id: minor
+      shell: sh
+      run: echo "::set-output name=version::$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1,2)"
+    - name: Get major version
+      id: major
+      shell: sh
+      run: echo "::set-output name=version::$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1)"
