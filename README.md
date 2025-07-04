@@ -11,8 +11,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:  
-      - uses: applicreation/versions-action@v1
+      - uses: applicreation/versions-action@v2
         id: versions
+        with:
+          version: ${{ github.ref }}
       - run: echo ${{ steps.versions.outputs.patch }}
       - run: echo ${{ steps.versions.outputs.minor }}
       - run: echo ${{ steps.versions.outputs.major }}
@@ -44,8 +46,10 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Get versions
-        uses: applicreation/versions-action@v1
+        uses: applicreation/versions-action@v2
         id: versions
+        with:
+          version: ${{ github.ref }}
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
