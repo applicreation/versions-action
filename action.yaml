@@ -24,13 +24,10 @@ runs:
   steps:
     - name: Get patch version
       id: patch
-      shell: sh
-      run: echo ::set-output name=version::$(echo ${{ inputs.version }} | cut -d / -f 3)
+      run: echo "version=$(echo ${{ inputs.version }} | cut -d / -f 3)" >> $GITHUB_OUTPUT
     - name: Get minor version
       id: minor
-      shell: sh
-      run: echo "::set-output name=version::$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1,2)"
+      run: echo "version=$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1,2)" >> $GITHUB_OUTPUT
     - name: Get major version
       id: major
-      shell: sh
-      run: echo "::set-output name=version::$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1)"
+      run: echo "version=$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1)" >> $GITHUB_OUTPUT
