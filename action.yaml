@@ -6,34 +6,35 @@ branding:
   icon: bookmark
   color: green
 inputs:
-  version:
+  tag:
     description: The full semantic version to parse
     required: true
 outputs:
   patch:
-    description: The patch version tag
-    value: ${{ steps.patch.outputs.version }}
+    description: The patch version number
+    value: ${{ steps.parse.outputs.patch }}
   minor:
-    description: The minor version tag
-    value: ${{ steps.minor.outputs.version }}
+    description: The minor version number
+    value: ${{ steps.parse.outputs.minor }}
   major:
-    description: The major version tag
-    value: ${{ steps.major.outputs.version }}
+    description: The major version number
+    value: ${{ steps.parse.outputs.major }}
 runs:
   using: composite
   steps:
     - name: Validate version input
       run: |
-        if [[ ! ${{ inputs.version }} =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "Invalid version format. Expected format: vX.Y.Z or X.Y.Z"
+        if [[ ! ${{ inputs.tag }} =~ (^refs/tags/)?v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Invalid version format. Expected format: refs/tags/vX.Y.Z, refs/tags/X.Y.Z, vX.Y.Z or X.Y.Z"
           exit 1
         fi
-    - name: Get patch version
-      id: patch
-      run: echo "version=$(echo ${{ inputs.version }} | cut -d / -f 3)" >> $GITHUB_OUTPUT
-    - name: Get minor version
-      id: minor
-      run: echo "version=$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1,2)" >> $GITHUB_OUTPUT
-    - name: Get major version
-      id: major
-      run: echo "version=$(echo ${{ steps.patch.outputs.version }} | cut -d '.' -f 1)" >> $GITHUB_OUTPUT
+    - name: Parse version input
+      id: parse
+      run: |
+        version="${{ inputs.tag }}"
+        version="${version##*/}"
+        version="${version#v}"
+        IFS='.' read -r major minor patch <<< "$version"
+        echo "major=$major" >> $GITHUB_OUTPUT
+        echo "minor=$minor" >> $GITHUB_OUTPUT
+        echo "patch=$patch" >> $GITHUB_OUTPUT
