@@ -5,6 +5,10 @@ description: GitHub action for parsing semantic versions
 branding:
   icon: bookmark
   color: green
+inputs:
+  version:
+    description: The full semantic version to parse
+    required: true
 outputs:
   patch:
     description: The patch version tag
@@ -21,7 +25,7 @@ runs:
     - name: Get patch version
       id: patch
       shell: sh
-      run: echo ::set-output name=version::$(echo ${{ github.ref }} | cut -d / -f 3)
+      run: echo ::set-output name=version::$(echo ${{ inputs.version }} | cut -d / -f 3)
     - name: Get minor version
       id: minor
       shell: sh
