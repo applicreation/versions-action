@@ -22,6 +22,12 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Validate version input
+      run: |
+        if [[ ! ${{ inputs.version }} =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Invalid version format. Expected format: vX.Y.Z or X.Y.Z"
+          exit 1
+        fi
     - name: Get patch version
       id: patch
       run: echo "version=$(echo ${{ inputs.version }} | cut -d / -f 3)" >> $GITHUB_OUTPUT
