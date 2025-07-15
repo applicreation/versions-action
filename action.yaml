@@ -7,12 +7,12 @@ branding:
   color: green
 inputs:
   tag:
-    description: The full semantic version to parse
+    description: The full semantic version to parse (e.g., v1.2.3 or 1.2.3)
     required: true
 outputs:
-  prefix:
-    description: The prefix of the version (e.g., "refs/tags/", "v", or empty)
-    value: ${{ steps.parse.outputs.prefix }}
+  has_prefix:
+    description: Whether the version has a prefix (true/false)
+    value: ${{ steps.parse.outputs.has_prefix }}
   major:
     description: The major version number
     value: ${{ steps.parse.outputs.major }}
@@ -28,8 +28,8 @@ runs:
     - name: Validate version input
       shell: bash
       run: |
-        if [[ ! ${{ inputs.tag }} =~ (^refs/tags/)?v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "Invalid version format. Expected format: refs/tags/vX.Y.Z, refs/tags/X.Y.Z, vX.Y.Z or X.Y.Z"
+        if [[ ! ${{ inputs.tag }} =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Invalid version format. Expected format: vX.Y.Z or X.Y.Z"
           exit 1
         fi
     - name: Parse version input
@@ -37,20 +37,13 @@ runs:
       shell: bash
       run: |
         version="${{ inputs.tag }}"
-        prefix=""
-        if [[ "$version" == refs/tags/v* ]]; then
-          prefix="refs/tags/v"
-          version="${version#refs/tags/v}"
-        elif [[ "$version" == refs/tags/* ]]; then
-          prefix="refs/tags/"
-          version="${version#refs/tags/}"
-        elif [[ "$version" == v* ]]; then
-          prefix="v"
+        has_prefix="false"
+        if [[ "$version" == v* ]]; then
+          has_prefix="true"
           version="${version#v}"
         fi
-        clean_version="$version"
-        IFS='.' read -r major minor patch <<< "$clean_version"
-        echo "prefix=$prefix" >> $GITHUB_OUTPUT
+        IFS='.' read -r major minor patch <<< "$version"
+        echo "has_prefix=$has_prefix" >> $GITHUB_OUTPUT
         echo "major=$major" >> $GITHUB_OUTPUT
         echo "minor=$minor" >> $GITHUB_OUTPUT
         echo "patch=$patch" >> $GITHUB_OUTPUT
