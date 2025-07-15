@@ -10,19 +10,23 @@ inputs:
     description: The full semantic version to parse
     required: true
 outputs:
-  patch:
-    description: The patch version number
-    value: ${{ steps.parse.outputs.patch }}
-  minor:
-    description: The minor version number
-    value: ${{ steps.parse.outputs.minor }}
+  prefix:
+    description: The prefix of the version (e.g., "refs/tags/", "v", or empty)
+    value: ${{ steps.parse.outputs.prefix }}
   major:
     description: The major version number
     value: ${{ steps.parse.outputs.major }}
+  minor:
+    description: The minor version number
+    value: ${{ steps.parse.outputs.minor }}
+  patch:
+    description: The patch version number
+    value: ${{ steps.parse.outputs.patch }}
 runs:
   using: composite
   steps:
     - name: Validate version input
+      shell: bash
       run: |
         if [[ ! ${{ inputs.tag }} =~ (^refs/tags/)?v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           echo "Invalid version format. Expected format: refs/tags/vX.Y.Z, refs/tags/X.Y.Z, vX.Y.Z or X.Y.Z"
@@ -30,11 +34,23 @@ runs:
         fi
     - name: Parse version input
       id: parse
+      shell: bash
       run: |
         version="${{ inputs.tag }}"
-        version="${version##*/}"
-        version="${version#v}"
-        IFS='.' read -r major minor patch <<< "$version"
+        prefix=""
+        if [[ "$version" == refs/tags/v* ]]; then
+          prefix="refs/tags/v"
+          version="${version#refs/tags/v}"
+        elif [[ "$version" == refs/tags/* ]]; then
+          prefix="refs/tags/"
+          version="${version#refs/tags/}"
+        elif [[ "$version" == v* ]]; then
+          prefix="v"
+          version="${version#v}"
+        fi
+        clean_version="$version"
+        IFS='.' read -r major minor patch <<< "$clean_version"
+        echo "prefix=$prefix" >> $GITHUB_OUTPUT
         echo "major=$major" >> $GITHUB_OUTPUT
         echo "minor=$minor" >> $GITHUB_OUTPUT
         echo "patch=$patch" >> $GITHUB_OUTPUT
