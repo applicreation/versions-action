@@ -15,7 +15,8 @@ jobs:
         id: versions
         with:
           tag: ${{ github.ref }}
-      - run: echo ${{ steps.versions.outputs.patch }}
-      - run: echo ${{ steps.versions.outputs.minor }}
+      - run: echo ${{ steps.versions.outputs.prefix }}
       - run: echo ${{ steps.versions.outputs.major }}
+      - run: echo ${{ steps.versions.outputs.minor }}
+      - run: echo ${{ steps.versions.outputs.patch }}
 ```
